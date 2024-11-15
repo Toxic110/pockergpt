@@ -1,6 +1,7 @@
 import type { RadioChangeEvent } from "antd";
 import { useState, useEffect } from "react";
 import { Radio, Button, Spin, Modal } from "antd";
+import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import OpenAI from "openai";
 import { ClubsDeck, DiamondsDeck, HeartsDeck, SpadesDeck } from "./data";
 import "./App.css";
@@ -22,6 +23,7 @@ function App() {
   const [allSelectedCards, setAllSelectedCards] = useState<Card[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [answer, setAnswer] = useState<string | null>("");
+  const [count, setCount] = useState<number>(2);
   const AllDecs = ClubsDeck.concat(DiamondsDeck, HeartsDeck, SpadesDeck);
 
   useEffect(() => {
@@ -104,7 +106,7 @@ function App() {
       .join(", ");
 
     // const question = `calculate the percentage of my victory in Texas Hold'em if I have a ${selectedYourCardsText} in my hand, on the table there is a ${selectedBoardCardsText}, and my opponents have an ${selectedOppositionCardsText}`;
-    const question = `посчитай процент моей победы в раздаче в Texas Hold'em если у меня в руке ${selectedYourCardsText}, на столе комбинация карт ${selectedBoardCardsText}, а оппоненты сбросили карты ${selectedOppositionCardsText}`;
+    const question = `посчитай процент моей победы в раздаче в Texas Hold'em если за столом осталось ${count} человек включая меня и если у меня в руке ${selectedYourCardsText}, на столе комбинация карт ${selectedBoardCardsText}, а оппоненты сбросили карты ${selectedOppositionCardsText}`;
 
     const response = await openai.chat.completions.create({
       messages: [{ role: "user", content: question }],
@@ -125,6 +127,16 @@ function App() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleIncCount = () => {
+    setCount(prev => prev + 1);
+  };
+
+  const handleDecCoun = () => {
+    if (count > 2) {
+      setCount(prev => prev - 1);
+    }
   };
 
   return (
@@ -156,6 +168,20 @@ function App() {
         >
           Спросить
         </Button>
+        <div className="counter">
+          <div className="counter__label">Оставшиеся фиши включая тебя</div>
+          <Button
+            type="primary"
+            onClick={handleDecCoun}
+            icon={<MinusCircleOutlined />}
+          />
+          <span style={{ margin: "20px" }}>{count}</span>
+          <Button
+            type="primary"
+            onClick={handleIncCount}
+            icon={<PlusCircleOutlined />}
+          />
+        </div>
         <Radio.Group onChange={onChange} value={selectedBlock}>
           <Radio value="yourCards">
             <div className="selected-panel">

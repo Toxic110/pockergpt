@@ -66,3 +66,7 @@ main {
 .ant-radio-wrapper {
   margin-bottom: 20px;
 }
+
+.counter__label {
+  margin-bottom: 8px;
+}
